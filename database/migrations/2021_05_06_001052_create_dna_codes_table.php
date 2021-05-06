@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDnasTable extends Migration
+class CreateDnaCodesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateDnasTable extends Migration
      */
     public function up()
     {
-        Schema::create('dnas', function (Blueprint $table) {
+        Schema::create('dna_codes', function (Blueprint $table) {
             $table->id();
             $table->string('code');
             $table->integer('mutations')->nullable();
@@ -28,6 +28,6 @@ class CreateDnasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('dnas');
+        Schema::dropIfExists('dna_codes');
     }
 }

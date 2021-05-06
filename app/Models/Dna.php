@@ -10,6 +10,13 @@ class Dna extends Model
     use HasFactory;
 
     /**
+     * The name of the table for the model
+     *
+     * @var string
+     */
+    protected $table = 'dna_codes';
+
+    /**
      * Fields that could be filled in bulk update in the model
      *
      * @var array
@@ -69,9 +76,9 @@ class Dna extends Model
 
         foreach ($codeArray as $y => $row) {
             foreach ($row as $x => $char) {
-                $rightRange = ($x+3) <= 5;
-                $bottomRange = ($y+3) <= 5;
-                $leftRange = $x >= 3;
+                $rightRange = ($x + $this->mutationLength - 1) <= $this->sequenceIndexXLimit;
+                $bottomRange = ($y + $this->mutationLength - 1) <= $this->sequenceIndexYLimit;
+                $leftRange = $x >= $this->mutationLength - 1;
 
                 // Check for Right horizontal
                 if ($rightRange) {
@@ -98,8 +105,23 @@ class Dna extends Model
         return $mutations;
     }
 
-    protected function checkSequence($codeArray, $x, $y, $xSum = 1, $ySum = 0)
+    /**
+     * Check a single sequence for the given parameters
+     *
+     * @param  array  $codeArray
+     * @param  int  $x
+     * @param  int  $y
+     * @param  int  $xSum
+     * @param  int  $ySum
+     * @return int
+     */
+    protected function checkSequence($codeArray, $x, $y, $xSum = 1, $ySum = 0): int
     {
+        // Prevent for stuck on the method
+        if ($xSum == 0 && $ySum == 0) {
+            return 0;
+        }
+
         $char = $codeArray[$y][$x];
         $equals = 1;
         $tempX = $x + $xSum;
@@ -113,12 +135,46 @@ class Dna extends Model
             $tempX = $tempX + $xSum;
             $tempY = $tempY + $ySum;
 
-            if ($equals == 4) {
+            if ($equals == $this->mutationLength) {
                 $mutations++;
                 break;
             }
-        }while($tempX <= 5 && $tempX >= 0 && $tempY >= 0 && $tempY <= 5);
+        }while(
+            $tempX <= $this->sequenceIndexXLimit &&
+            $tempY <= $this->sequenceIndexYLimit &&
+            $tempX >= 0 && $tempY >= 0
+        );
 
         return $mutations;
+    }
+
+    /**
+     * Return the last permitted index for the X value
+     *
+     * @return int
+     */
+    public function getSequenceIndexXLimitAttribute()
+    {
+        return config('dna.sequence_length') - 1;
+    }
+
+    /**
+     * Return the last permitted index for the Y value
+     *
+     * @return int
+     */
+    public function getSequenceIndexYLimitAttribute()
+    {
+        return config('dna.sequence_height') - 1;
+    }
+
+    /**
+     * Return the expected length to consider a mutation sequence
+     *
+     * @return int
+     */
+    public function getMutationLengthAttribute()
+    {
+        return config('dna.mutation_length');
     }
 }

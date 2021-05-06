@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Dna;
 use App\Http\Requests\DnaRequest;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Throwable;
 
 class MutationController extends Controller
 {
@@ -14,10 +16,18 @@ class MutationController extends Controller
      * @param  \App\Http\Requests\DnaRequest
      * @return \Illuminate\Http\Response
      */
-    public function store(DnaRequest $request): Response
+    public function store(DnaRequest $request)
     {
-        $dna = Dna::saveByCode($request->dna);
+        try {
+            $dna = Dna::saveByCode($request->dna);
 
-        dd($dna->hasMutations);
+            if (! $dna->hasMutations) {
+                throw new AccessDeniedHttpException('The given DNA code doesn\'t have a mutation sequence');
+            }
+
+            return response()->make();
+        } catch (Throwable $e) {
+            throw new UnprocessableEntityHttpException('There was a problem trying to process the DNA code');
+        }
     }
 }
