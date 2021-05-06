@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Dna;
 use App\Http\Requests\DnaRequest;
 use Illuminate\Http\Response;
 
@@ -15,6 +16,8 @@ class MutationController extends Controller
      */
     public function store(DnaRequest $request): Response
     {
-        dd($request->toArray());
+        $dna = Dna::saveByCode($request->dna);
+
+        dd($dna->hasMutations);
     }
 }

@@ -16,7 +16,7 @@ class CreateDnasTable extends Migration
         Schema::create('dnas', function (Blueprint $table) {
             $table->id();
             $table->string('code');
-            $table->integer('mutations');
+            $table->integer('mutations')->nullable();
             $table->timestamps();
         });
     }
