@@ -11,7 +11,8 @@ use App\Http\Controllers\AuthController;
 */
 Route::post('/auth', AuthController::class);
 
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::prefix('v1')
+    ->middleware(['auth:sanctum'])->group(function () {
     Route::post('/mutation', [
         MutationController::class,
         'store'
