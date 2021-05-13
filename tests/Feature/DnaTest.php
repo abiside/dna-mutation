@@ -41,12 +41,46 @@ class DnaTest extends TestCase
         ]);
 
         $this->postJson($url, $payload)
-            ->dump()
             ->assertStatus(200);
 
         $this->assertDatabaseHas('dna_codes', [
             'code' => implode(',', Arr::get($payload, 'dna')),
         ]);
+    }
+
+    /** @test */
+    public function it_finds_mutation_for_an_already_saved_code()
+    {
+        $user = $this->getAuthUser();
+
+        $url = $this->getEndpoint();
+
+        $payload = [
+            'dna' => [
+                "ATGCGA",
+                "CAGTGC",
+                "TTATGT",
+                "AGAAGG",
+                "CCCCTA",
+                "TCACTG",
+            ],
+        ];
+
+        $this->assertDatabaseMissing('dna_codes', [
+            'code' => implode(',', Arr::get($payload, 'dna')),
+        ]);
+
+        $this->postJson($url, $payload)
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('dna_codes', [
+            'code' => implode(',', Arr::get($payload, 'dna')),
+        ]);
+
+        $this->postJson($url, $payload)
+            ->assertStatus(200);
+
+        $this->assertDatabaseCount('dna_codes', 1);
     }
 
     /** @test */
@@ -76,7 +110,6 @@ class DnaTest extends TestCase
         $url = $this->getEndpoint();
 
         $this->postJson($url)
-            ->dump()
             ->assertStatus(401)
             ->assertJson([
                 'message' => 'Unauthenticated.',
@@ -102,7 +135,6 @@ class DnaTest extends TestCase
         ];
 
         $this->postJson($url, $payload)
-            ->dump()
             ->assertStatus(422)
             ->assertJson([
                 'message' => 'The given data was invalid.',
@@ -132,7 +164,6 @@ class DnaTest extends TestCase
         ];
 
         $this->postJson($url, $payload)
-            ->dump()
             ->assertStatus(422)
             ->assertJson([
                 'message' => 'The given data was invalid.',
@@ -154,7 +185,6 @@ class DnaTest extends TestCase
         $payload = [];
 
         $this->postJson($url, $payload)
-            ->dump()
             ->assertStatus(422)
             ->assertJson([
                 'message' => 'The given data was invalid.',

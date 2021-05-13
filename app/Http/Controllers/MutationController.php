@@ -16,7 +16,7 @@ class MutationController extends Controller
      * @param  \App\Http\Requests\DnaRequest
      * @return \Illuminate\Http\Response
      */
-    public function store(DnaRequest $request)
+    public function __invoke(DnaRequest $request)
     {
         try {
             $dna = Dna::saveByCode($request->dna);
