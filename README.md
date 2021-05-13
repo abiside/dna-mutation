@@ -14,7 +14,7 @@ This is a PHP/Laravel application project
 - PHP 7.3^
 - MySQL 5.6^
 - Laravel 8
-- Composer installer
+- Composer
 
 
 ## Installation
